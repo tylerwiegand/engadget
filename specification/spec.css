@@ -1,0 +1,50 @@
+html
+{
+	background-color: #00005C;
+	border-left: 1em solid #415cb2;
+}
+
+h1
+{
+	margin-left: .3em;
+	color: #99CCFF;
+	font-size: 7em;
+	font-variant: small-caps;
+	font-family: monospace;
+	font-stretch: expanded;
+	text-shadow: .05em .05em #6B8FB2;
+}
+
+h2
+{
+	margin-left: .5em;
+	color: #99CCFF;
+	font-size: 5em;
+	font-variant: small-caps;
+	font-family: monospace;
+	font-stretch: expanded;
+	text-shadow: .05em .05em #6B8FB2;
+}
+
+
+
+ul, ol
+{
+	list-style-position: inside;
+	color: #6699FF;
+	font-size: 2em;
+	font-variant: initial;
+	font-stretch: condensed;
+	max-width: 40em;
+}
+
+p
+{
+	text-indent: 1em;
+	margin-left: 1em;
+	color: #6699FF;
+	font-size: 2em;
+	font-variant: initial;
+	font-stretch: condensed;
+	max-width: 35em;
+}
