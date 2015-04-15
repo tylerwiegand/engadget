@@ -44,6 +44,9 @@
 			<p>
 				Users will be able to like articles, comments, and replies. Users will NOT like their own comments and replies.
 			</p>
-		<img src="" />
+		<img src="engadget.png" />
+		<p>
+			<a href="../index.php">Home</a>
+		</p>
 	</body>
 </html>

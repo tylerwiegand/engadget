@@ -38,7 +38,7 @@ ul, ol
 	max-width: 40em;
 }
 
-p
+p, a
 {
 	text-indent: 1em;
 	margin-left: 1em;
@@ -47,4 +47,9 @@ p
 	font-variant: initial;
 	font-stretch: condensed;
 	max-width: 35em;
+}
+
+img
+{
+	-webkit-filter: invert(100%);
 }
