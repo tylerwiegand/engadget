@@ -1,7 +1,7 @@
 html
 {
-	background-color: #00005C;
-	border-left: 1em solid #415cb2;
+	background-color: rgba(230, 255, 232, 0.11);
+	border-left: 1em solid rgba(181, 208, 255, 0.6);
 }
 
 h1
@@ -38,7 +38,7 @@ ul, ol
 	max-width: 40em;
 }
 
-p, a
+p
 {
 	text-indent: 1em;
 	margin-left: 1em;
@@ -49,7 +49,32 @@ p, a
 	max-width: 35em;
 }
 
+a
+{
+	text-indent: 1em;
+	margin-left: 1em;
+	color: #6699FF;
+	font-size: 2em;
+	font-variant: initial;
+	font-stretch: condensed;
+	max-width: 35em;
+}
+
+a
+{
+	background: #3498db;
+	border-radius: 6px;
+	box-shadow: 2px 3px 8px #666666;
+	background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+	font-family: monospace;
+	color: #ffffff;
+	font-size: 20px;
+	padding: 13px;
+	text-decoration: none;
+}
+
 img
 {
-	-webkit-filter: invert(100%);
+	max-width: 75%;
+	max-height: 75%;
 }

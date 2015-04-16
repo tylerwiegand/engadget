@@ -10,8 +10,10 @@
 		<h1>
 			Specification
 		</h1>
-		<p><a href="specification/personas.php">Personas</a></p>
-		<p><a href="specification/usecase.php">Use Case</a></p>
-		<p><a href="specification/schema.php">Schema</a></p>
+		<p>
+		<a href="specification/personas.php">Personas</a>
+		<a href="specification/usecase.php">Use Case</a>
+		<a href="specification/schema.php">Schema</a>
+		</p>
 	</body>
 </html>
