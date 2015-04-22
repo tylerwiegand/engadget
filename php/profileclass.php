@@ -49,7 +49,7 @@ class Profile {
 			$this->setProfilePermissions($newProfilePermissions);
 			$this->setProfileAvatar($newProfileAvatar);
 		} catch(UnexpectedValueException $exception) {
-			// (RE)Throw to the caller (the originating exception?
+			// RE-Throw to the construct requestor
 			throw(new UnexpectedValueException("Unable to create profile.", 0, $exception));
 		}
 	}
@@ -161,5 +161,21 @@ class Profile {
 		//store the $newProfileName string
 		$this->profileAvatar = $newProfileAvatar;
 	}
+
+	/**
+	 * toString() magic method
+	 *
+	 * @return string formatted in HTML for Profile class constructor
+	 */
+	public function __toString() {
+		//create an HTML formatted Profile
+		$html = 		"<p>Profile Id: " .	$this->profileId			. "<br />"
+						. "Profile Name: ".	$this->profileName				. "<br />"
+						. "Profile Perm: ".	$this->profilePermissions		. "<br />"
+						. "Avatar:<br />	<img src=" . $this->profileAvatar . " />"
+						. "</p>";
+		return($html);
+	}
+
 }
 ?>

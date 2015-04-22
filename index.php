@@ -14,6 +14,7 @@
 		<a href="specification/personas.php">Personas</a>
 		<a href="specification/usecase.php">Use Case</a>
 		<a href="specification/schema.php">Schema</a>
+			<a href="php/profiletest.php">Profile Test</a>
 		</p>
 	</body>
 </html>
