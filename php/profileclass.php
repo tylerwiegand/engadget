@@ -42,7 +42,7 @@ class Profile {
 	 * @param string $newProfileAvatar new profileAvatar
 	 * @throws UnexpectedValueException if any parameters don't meet expectation (see mutator methods)
 	 */
-	public function __construct($newProfileId, $newProfileName, $newProfileAvatar = "http://www.gravatar.com/avatar/00000000000000000000000000000000?d=http%3A%2F%2Fexample.com%2Fimages%2Favatar.jpg", $newProfilePermissions = 0) {
+	public function __construct($newProfileId, $newProfileName, $newProfilePermissions = 0, $newProfileAvatar = "http://www.gravatar.com/avatar/00000000000000000000000000000000?d=http%3A%2F%2Fexample.com%2Fimages%2Favatar.jpg") {
 		try {
 			$this->setProfileId($newProfileId);
 			$this->setProfileName($newProfileName);
