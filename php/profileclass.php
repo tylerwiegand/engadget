@@ -10,6 +10,7 @@
  *
  * @author Tyler Wiegand <tyler dot wiegand at me dot com>
  **/
+
 class Profile {
 	/**
 	 * unique ID for this profile; primary key
@@ -42,18 +43,34 @@ class Profile {
 	 * @param string $newProfileAvatar new profileAvatar
 	 * @throws UnexpectedValueException if any parameters don't meet expectation (see mutator methods)
 	 */
-	public function __construct($newProfileId, $newProfileName, $newProfilePermissions = 0, $newProfileAvatar = "http://www.gravatar.com/avatar/00000000000000000000000000000000?d=http%3A%2F%2Fexample.com%2Fimages%2Favatar.jpg") {
+	public function __construct($newProfileId, $newProfileName, $newProfilePermissions = 0, $newProfileAvatar = "http://www.gravatar.com/avatar/00000000000000000000000000000000") {
 		try {
 			$this->setProfileId($newProfileId);
 			$this->setProfileName($newProfileName);
 			$this->setProfilePermissions($newProfilePermissions);
 			$this->setProfileAvatar($newProfileAvatar);
 		} catch(UnexpectedValueException $exception) {
-			// RE-Throw to the construct requestor
+			// RE-Throw to the construct requester
 			throw(new UnexpectedValueException("Unable to create profile.", 0, $exception));
 		}
 	}
 
+	/**
+	 * toString() magic method
+	 *
+	 * @return string formatted in HTML for Profile class constructor
+	 */
+
+	// this allows the class to be Echo'd as a string in HTML format
+	public function __toString() {
+		//create an HTML formatted Profile
+		$html = 		"<p>Profile Id: " .	$this->profileId			. "<br />"
+			. "Profile Name: ".	$this->profileName				. "<br />"
+			. "Profile Perm: ".	$this->profilePermissions		. "<br />"
+			. "Avatar:<br />	<img src=" . $this->profileAvatar . " />"
+			. "</p>";
+		return($html);
+	}
 
 	/**
 	 * accessor method to profileId
@@ -80,9 +97,6 @@ class Profile {
 		//THEN store it into THIS object's profileId
 		$this->profileId = intval($newProfileId);
 	}
-
-
-
 
 
 	/**
@@ -125,6 +139,9 @@ class Profile {
 	 * @param int $newProfilePermissions - new value of profilePermissions
 	 * @throws UnexpectedValueException if $profileId is NOT INT
 	 */
+		// declare a function accessible to any requester inside profile class
+		// that you can ask me to put a value into profilePermissions, a variable
+		// that references (or IS the value in) an SQL database.
 	public function setProfilePermissions($newProfilePermissions) {
 		// verify the value of profileId is a valid int, or if it is greater than 1
 		$newProfilePermissions = filter_var($newProfilePermissions, FILTER_VALIDATE_INT);
@@ -152,30 +169,34 @@ class Profile {
 	 * @throws UnexpectedValueException if $profileId is not a string
 	 */
 	public function setProfileAvatar($newProfileAvatar) {
-		// verify the value of profileAvatar is a valid URL AND if it contains
-		// the gravatar img link prelude
+		// sanitize the value of profileAvatar so that it can be nothing other than a URL
+		// it also checks to see if the sanitization changed the entry
 		$newProfileAvatar = filter_var($newProfileAvatar, FILTER_SANITIZE_URL);
-		if($newProfileAvatar === false || strpos($newProfileAvatar, "http://www.gravatar.com/avatar/") !== false) {
+		if($newProfileAvatar === false) {
 			throw(new UnexpectedValueException("Profile Avatar is not a valid URL."));
 		}
 		//store the $newProfileName string
 		$this->profileAvatar = $newProfileAvatar;
 	}
 
+
+	//PDO SECTION
 	/**
-	 * toString() magic method
+	 * This function allows the profile class to insert values
+	 * into the mySQL database table "profile." It utilizes the PDO
+	 * class built into PHP. @see php.net PDO class.
 	 *
-	 * @return string formatted in HTML for Profile class constructor
-	 */
-	public function __toString() {
-		//create an HTML formatted Profile
-		$html = 		"<p>Profile Id: " .	$this->profileId			. "<br />"
-						. "Profile Name: ".	$this->profileName				. "<br />"
-						. "Profile Perm: ".	$this->profilePermissions		. "<br />"
-						. "Avatar:<br />	<img src=" . $this->profileAvatar . " />"
-						. "</p>";
-		return($html);
-	}
+	 * @param PDO $pdo pointer to PDO connection, by reference
+	 * @throws PDOException when mySQL related errors occur
+	 **/
+	/*public function insert(PDO &$pdo) {
+		// enforce the tweetId is null (i.e., don't insert a tweet that already exists)
+		if($this->tweetId !== null) {
+			throw(new PDOException("not a new tweet"));
+		}
+	*/
+
+
 
 }
 ?>
