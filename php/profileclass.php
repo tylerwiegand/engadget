@@ -180,23 +180,212 @@ class Profile {
 	}
 
 
-	//PDO SECTION
+	//////////////////////PDO SECTION/////////////////////////
 	/**
 	 * This function allows the profile class to insert values
 	 * into the mySQL database table "profile." It utilizes the PDO
 	 * class built into PHP. @see php.net PDO class.
 	 *
-	 * @param PDO $pdo pointer to PDO connection, by reference
+	 * @param PDO $insertParameters pointer to PDO connection, by reference
 	 * @throws PDOException when mySQL related errors occur
 	 **/
-	/*public function insert(PDO &$pdo) {
-		// enforce the tweetId is null (i.e., don't insert a tweet that already exists)
-		if($this->tweetId !== null) {
-			throw(new PDOException("not a new tweet"));
+	public function insert(PDO &$insertParameters) {
+		// ensure that you don't attempt to pass a profile ID directly to database
+		// profile ID is an auto_incremental value!
+		if($this->profileId !== null) {
+			throw(new PDOException("This profile ID has already been created!"));
 		}
-	*/
+
+		// First step in the process to send an SQL command from PHP
+		$query = "INSERT INTO profile(profileId, profileName, profilePermissions, profileAvatar)
+					 				 VALUES(:profileId, :profileName, :profilePermissions, :profileAvatar)";
+
+		// turn $unpreparedStatement into $preparedStatement with the contents of $query and the prepare PDO method
+		$preparedStatement = $insertParameters->prepare($query);
+
+		// create an array filled with
+		$parameters = 	array("profileId" => $this->profileId,
+									"profileName" => $this->profileName,
+									"profilePermissions" => $this->profilePermissions,
+									"profileAvatar" => $this->profileAvatar);
+
+		// take the parameters given and stick them into the :denoted places in $query
+		// the prepared statement now executes with inserted parameters
+		$preparedStatement->execute($parameters);
+
+		// FINALLY, we can catch up to a full object with the profileId that
+		// we just generated automagically within mySQL
+		// "please tell me what box i just stuck all my junk into, please mySQL??"
+		$this->profileId = intval($insertParameters->lastInsertId());
+		}
+
+	/**
+	 * deletes this profile NAME and AVATAR from mySQL
+	 *
+	 * @param PDO $deleteParameters pointer to PDO connection, by reference
+	 * @throws PDOException when mySQL related errors occur
+	 **/
+	public function delete(PDO &$deleteParameters) {
+		if($this->profileId === null) {
+			throw(new PDOException("How you gonna delete somethin' that ain't THERE?"));
+		}
+		$query	 = "DELETE FROM profileName, profileAvatar WHERE profileId = :profileId";
+		$preparedStatement = $deleteParameters->prepare($query);
+		$parameters = array("profileId" => $this->profileId);
+		$preparedStatement->execute($parameters);
+	}
+
+	/**
+	 * updates this Tweet in mySQL
+	 *
+	 * @param PDO $updateParameters pointer to PDO connection, by reference
+	 * @throws PDOException when mySQL related errors occur
+	 **/
+	public function update(PDO &$updateParameters) {
+		// enforce the profileId is not null...don't modify things that aren't as they should be
+		if($this->profileId === null) {
+			throw(new PDOException("That Profile ID does not exist...yet!"));
+		}
+		// update the profile table by the value of the profileId
+		$query		= "UPDATE profile SET 	profileId = :profileId,
+														profileName = :profileName,
+														profilePermissions = :profilePermissions,
+														profileAvatar = :profileAvatar
+							WHERE						profileId = :profileId";
+
+		$preparedStatement	= $updateParameters->prepare($query);
+
+		// bind the member variables to the place holders in the template
+		$parameters =  array("profileId" => $this->profileId,
+									"profileName" => $this->profileName,
+									"profilePermissions" => $this->profilePermissions,
+									"profileAvatar" => $this->profileAvatar);
+		$preparedStatement->execute($parameters);
+	}
+
+	/**
+	 * gets the profile by profileId
+	 *
+	 * @param PDO $getProfileParameters pointer to PDO connection, by reference
+	 * @param int $profileId tweet id to search for
+	 * @return mixed Profile found or null if not found
+	 * @throws PDOException when mySQL related errors occur
+	 **/
+	public static function getProfileByProfileId(PDO &$getProfileParameters, $profileId) {
+		$profileId = filter_var($profileId, FILTER_VALIDATE_INT);
+		if($profileId === false) {
+			throw(new PDOException("Profile ID given is not valid."));
+		}
+		if($profileId <= 0) {
+			throw(new PDOException("Profile ID's must be above 0."));
+		}
+
+		// template for our mySQL statement. we put the :profileId in from the $profileId arg later on...
+		$query		= "SELECT profileId, profileName, profilePermissions, profileAvatar FROM profile WHERE profileId = :profileId";
+		// prepare the statement. PDO does it!
+		$preparedStatement	= $getProfileParameters->prepare($query);
+		// lets give some parameters for our statement. or arguments. ARGUE WITH STATEMENT!
+		$parameters = array("profileId" => $profileId);
+		// so we've just given $parameters something to chew on, and it's profileId, which came from our array
+		// that contains a relational array. this is so we can match it up to :profileId. It's a PDO thing!
+		// now we can tell PDO through the execute method to send our preparedStatement with parameters as the argument!
+		// MAGIC!
+		$preparedStatement->execute($parameters);
+		// now our preparedStatement has the same stuff it had it in before, we just used it in combination
+		// with parameters to do the execute. it's still there!
 
 
+		try {
 
+			// declare returnProfile so we can return it after we find what we're looking for (IF we do!)
+			// but we cant return NOTHING...well, we CAN return NULL but not nothing...ironic...
+			$returnProfile = null;
+			// within our preparedStatement variable, change the fetchmode in PDO so it gets it as an
+			// associative array
+			$preparedStatement->setFetchMode(PDO::FETCH_ASSOC);
+			// now our preparedStatement isn't what we care about. we want our results (as an array)
+			$results   = $preparedStatement->fetch();
+			// now if we actually got something, we want to be able to assign it to returnProfile. Remember
+			// results are from the PDO statement, returnProfile is what we want the METHOD to output.
+			if($results !== false) {
+				$returnProfile = new Profile($results["profileId"], $results["profileName"], $results["profilePermissions"], $results["profileAvatar"]);
+			}
+		} catch(Exception $exception) {
+			// exception? NO PROBLEM! Throw it ...away...to someone else.
+			throw(new PDOException($exception->getMessage(), 0, $exception));
+		}
+		// alright if everything went well we have our profile results returned to us. Nice!
+		return($returnProfile);
+	}
+
+	/**
+	 * gets the profile by profileName
+	 *
+	 * @param PDO $getProfileParameters pointer to PDO connection, by reference
+	 * @param int $profileName tweet id to search for
+	 * @return mixed Profile found or null if not found
+	 * @throws PDOException when mySQL related errors occur
+	 **/
+	public static function getProfileByProfileName(PDO &$getProfileParameters, $profileName) {
+		$profileName = trim($profileName);
+		$profileName = filter_var($profileName, FILTER_SANITIZE_STRING);
+		if(empty($profileName === true)) {
+			throw(new PDOException("Profile Name must be entered to search by it."));
+		}
+		// template for our mySQL statement. we put the :profileName in from the $profileName arg later on...
+		$query = "SELECT profileId, profileName, profilePermissions, profileAvatar FROM profile WHERE profileName = :profileName";
+
+		// prepare the statement. PDO does it!
+		$preparedStatement = $getProfileParameters->prepare($query);
+
+		// lets give some parameters for our statement. or arguments. ARGUE WITH STATEMENT!
+		$parameters = array("profileName" => "%$profileName%");
+
+		// so we've just given $parameters something to chew on, and it's profileName (with WILDCARD strings around
+		// it, which came from our array that contains a relational array. this is so we can match it up to
+		// :profileName. It's a PDO thing! now we can tell PDO through the execute method to send our
+		//  preparedStatement with parameters as the argument!
+
+		$preparedStatement->execute($parameters);
+		// now our preparedStatement has the same stuff it had it in before, we just used it in combination
+		// with parameters to do the execute. it's still there!
+
+		$returnProfileArray = new SplFixedArray($preparedStatement->rowCount());
+
+		$preparedStatement->setFetchMode(PDO::FETCH_ASSOC);
+			// declare returnProfile so we can return it after we find what we're looking for (IF we do!)
+			// but we cant return NOTHING...well, we CAN return NULL but not nothing...ironic...
+			$returnProfile = null;
+			// within our preparedStatement variable, change the fetchmode in PDO so it gets it as an
+			// associative array
+			$preparedStatement->setFetchMode(PDO::FETCH_ASSOC);
+			// so, if the mySQL search results from the prepared statement came back empty, null, etc,
+			// we will stop this process. otherwise, repeat!
+			while(($results = $preparedStatement->fetch()) !== false) {
+				try {
+					// return profile now is assigned the output from the Profile constructor as it relates to the
+					// current results from our mySQL statement. associative arrays fo LIFE
+					$returnProfile = new Profile($results["tweetId"], $results["profileId"], $results["tweetContent"], $results["tweetDate"]);
+					// so now that we have a profiles info (built from the Profile constructor), we need to
+					// store it somewhere else than where we already have it so we can keep adding to it (loopy!)
+					$returnProfileArray[$returnProfileArray->key()] = $returnProfile;
+					// and we store the info ^ up there so that later we can re-use ^ ($returnProfile) next time!
+					$returnProfileArray->next();
+					// now we increase the key() number so it doesnt just keep putting the entries
+					// into the same stupid array...stupid array...
+					// and of course, if something goes wrong...THROW IT AWAY!
+				} catch(Exception $exception) {
+					throw(new PDOException($exception->getMessage(), 0, $exception));
+				}
+			}
+			$numberOfProfiles = count($returnProfileArray);
+			if($numberOfProfiles === 0) {
+				return (null);
+			} else {
+				// alright if everything went well we have our profiles in a neat array.
+				return ($returnProfileArray);
+			}
+		}
 }
+
 ?>

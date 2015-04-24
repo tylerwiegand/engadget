@@ -9,4 +9,3 @@ $config = readConfig("/etc/apache2/data-design/twiegand.ini");
 $profile = new Profile(1, "Owner",1);
 echo $profile;
 ?>
-
